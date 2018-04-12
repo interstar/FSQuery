@@ -208,4 +208,4 @@ And, of course, you don't need to limit yourself to just copying one directory. 
 
 ## Known Issues
 
-###Currently FSQuery ignores symbolic links. ###
+### Currently FSQuery ignores symbolic links. 
