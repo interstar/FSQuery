@@ -219,6 +219,6 @@ if __name__ == '__main__' :
     
     fsq = FSQuery("/home/USER/CODE").Ext("py").NoFollow("\.git").FileOnly()
     for node in fsq :
-        print node.abs
+        print (node.abs)
         
     
