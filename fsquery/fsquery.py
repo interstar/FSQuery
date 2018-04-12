@@ -148,7 +148,7 @@ if __name__ == '__main__' :
     fsq.NoFollow("b")        
     fsq.process_each(Processor())
 
-    fsq = FSQuery("o")    
+    fsq = FSQuery("../..").Match(".js$").FileOnly()  
     for n in fsq :
         print n
         
