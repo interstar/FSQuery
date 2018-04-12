@@ -49,7 +49,14 @@ Filter out a directory you aren't interested in, using NoFollow.
             print n
 
 
-Note that you can add as many NoFollows and Matches as you like. NoFollows are patterns that are only applied to directories. Matches are patterns that are only applied to files. Note also that, although you have added a FileOnly() to this query this doesn't affect the pattern matches on the directory names. 
+Finally, of course, it's very useful (though somewhat slow) to be able to look inside the files and see what they contain.
+
+        fsq = FSQuery("../..").NoFollow("vendor").Ext("py").Contains("GNU Lesser General Public License").FileOnly()
+        for n in fsq :
+            print n.abs
+
+
+Note that you can add as many NoFollows and Matches and Contains as you like. NoFollows are filters that are only applied to directories. Matches and Contains are filters that are only applied to files. Note also that, although you have added a FileOnly() to a query this doesn't affect the pattern matches on the directory names. 
 
 Note also that if you add two Ext() constraints these will fight (no file can have two extensions at the same time) and your query will return nothing.
 
