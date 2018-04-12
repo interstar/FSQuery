@@ -217,7 +217,7 @@ Directories excluded by this filter are not searched."""
 if __name__ == '__main__' :
     from fsquery import FSQuery, FSNode
     
-    fsq = FSQuery("/home/USER/CODE/").Ext("py").NoFollow("\.git").NoFollow("bluedrive").FileOnly()
+    fsq = FSQuery("/home/USER/CODE").Ext("py").NoFollow("\.git").FileOnly()
     for node in fsq :
         print node.abs
         
