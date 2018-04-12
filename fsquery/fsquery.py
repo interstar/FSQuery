@@ -22,9 +22,9 @@ class FSNode :
         return FSQuery(self.abs)
         
     def add_file(self) :
-        if self.isdir() : raise "FSQuery tried to add a file in a node which is not a directory : %s" % self.
-            with open(fsNode.abs + "/new2.txt","w") as f :
-                f.write("this is new")
+        if self.isdir() : raise "FSQuery tried to add a file in a node which is not a directory : %s" % self.abs
+        with open(fsNode.abs + "/new2.txt","w") as f :
+            f.write("this is new")
         
     def __str__(self) :
         return "%s (%s)"% (self.abs, self.isdir())
