@@ -215,12 +215,11 @@ if __name__ == '__main__' :
     class Processor :
         def process_dir(self,fsNode) :
             print("this is a dir : %s" % fsNode)
-            fsNode.add_file("new4.txt","This has been made properly")
         def process_file(self,fsNode) :
-            pass
-            
-    fsq.NoFollow("b")        
+            print("this is a file : %s" % fsNode)
+        
     fsq.process_each(Processor())
+
 
     print "__________________________________________________------------------------------------------------------------"
     
@@ -252,13 +251,16 @@ if __name__ == '__main__' :
     print "----------------------------------------_______________________________---------------------------------------"
     
     class Shadower :
-        def process_dir(self,n,sn) :
-            sn.mk_dir()
-        def process_file(self,n,sn) :
-            content = n.open_file().read()
-            sn.write_file(sn.abs    ,content)
+        def process_dir(self,node,shadow_node) :
+            print node.abs
+            print shadow_node.abs
+            shadow_node.mk_dir()
             
-    fsq = FSQuery("o").NoFollow("a")
-    fsq.shadow("z",Shadower())
+        def process_file(self,node,shadow_node) :
+            content = node.open_file().read()
+            shadow_node.write_file(shadow_node.abs,content)
+            
+    fsq = FSQuery("o")
+    fsq.shadow("x",Shadower())
         
     
