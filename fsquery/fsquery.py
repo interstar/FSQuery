@@ -18,6 +18,14 @@ class FSNode :
     def children(self) :
         return [FSNode(self.abs + "/" + x,self.depth+1) for x in os.listdir(self.abs)]
         
+    def spawn_query(self) :
+        return FSQuery(self.abs)
+        
+    def add_file(self) :
+        if self.isdir() : raise "FSQuery tried to add a file in a node which is not a directory : %s" % self.
+            with open(fsNode.abs + "/new2.txt","w") as f :
+                f.write("this is new")
+        
     def __str__(self) :
         return "%s (%s)"% (self.abs, self.isdir())
             
@@ -78,6 +86,14 @@ class FSQuery :
     def foreach(self,visitor) :
         for w in self.walk() :
             visitor(w)
+
+    def process_each(self,visitor) :
+        for w in self.walk() :
+            if w.isdir() :
+                visitor.process_dir(w)
+            else :
+                visitor.process_file(w)
+
             
     def clone(self) :
         q = FSQuery(self.init_path)
@@ -115,11 +131,17 @@ class FSQuery :
         
 
 if __name__ == '__main__' :
-    fsq = FSQuery("/mnt/f/old_development/small_experiments").NoFollow("sudoku").NoFollow("test-rn")
-    fsq2 = fsq.clone()
-    fsq.FileOnly().Match(".py$")
-    fsq2.DirOnly().make_dir_include(lambda fsn : fsn.depth < 3)
+    fsq = FSQuery("o")
     def f(x) : print(x)
     fsq.foreach(f)
-    print("------------------------------------------------")
-    fsq2.foreach(f)
+
+    class Processor :
+        def process_dir(self,fsNode) :
+            print("this is a dir : %s" % fsNode)
+            with open(fsNode.abs + "/new2.txt","w") as f :
+                f.write("this is new")
+        def process_file(self,fsNode) :
+            pass
+            
+    fsq.NoFollow("b")        
+    fsq.process_each(Processor())
