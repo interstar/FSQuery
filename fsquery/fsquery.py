@@ -27,7 +27,7 @@ class FSNode :
             f.write("this is new")
         
     def __str__(self) :
-        return "%s (%s)"% (self.abs, self.isdir())
+        return "[FSNode : %s (isdir? %s)]"% (self.abs, self.isdir())
             
 
 
@@ -94,7 +94,9 @@ class FSQuery :
             else :
                 visitor.process_file(w)
 
-            
+    def __iter__(self) :
+        return (w for w in self.walk())
+                
     def clone(self) :
         q = FSQuery(self.init_path)
         q.dir_includes = self.dir_includes[:]
@@ -145,3 +147,8 @@ if __name__ == '__main__' :
             
     fsq.NoFollow("b")        
     fsq.process_each(Processor())
+
+    fsq = FSQuery("o")    
+    for n in fsq :
+        print n
+        
