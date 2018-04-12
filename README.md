@@ -32,26 +32,26 @@ Note that FSQuery matches using an ordinary regex, so you can use regex elements
 
 Add a FileOnly() call, to constrain the output to show only files (not directories)
 
-        fsq = FSQuery("../..").Match(".js$").FileOnly()  
+        fsq = FSQuery(path).Match(".js$").FileOnly()  
         for n in fsq :
             print n
 
 You can also explicitly match just file extensions.
 
-        fsq = FSQuery("../..").Ext("css").FileOnly()  
+        fsq = FSQuery(path).Ext("css").FileOnly()  
         for n in fsq :
             print n
 
 Filter out a directory you aren't interested in, using NoFollow.
 
-        fsq = FSQuery("../..").Match(".js$").NoFollow("vendor").FileOnly()  
+        fsq = FSQuery(path).Match(".js$").NoFollow("vendor").FileOnly()  
         for n in fsq :
             print n
 
 
 Finally, of course, it's very useful (though somewhat slow) to be able to look inside the files and see what they contain.
 
-        fsq = FSQuery("../..").NoFollow("vendor").Ext("py").Contains("GNU Lesser General Public License").FileOnly()
+        fsq = FSQuery(path).NoFollow("vendor").Ext("py").Contains("GNU Lesser General Public License").FileOnly()
         for n in fsq :
             print n.abs
 
@@ -69,7 +69,7 @@ From the previous examples, you'll notice that what is returned by FSQuery are F
 
 Eg.
 
-        fsq = FSQuery("../..").Match(".js$").NoFollow("vendor").FileOnly()  
+        fsq = FSQuery(path).Match(".js$").NoFollow("vendor").FileOnly()  
         for n in fsq :
             print n.abs
             
@@ -79,7 +79,7 @@ will lists the returned nodes as ordinary text (as if running `find` in Unix)
 
 Eg.
 
-        fsq = FSQuery("../..").NoFollow("vendor").Ext("py").FileOnly()
+        fsq = FSQuery(path).NoFollow("vendor").Ext("py").FileOnly()
         for n in fsq :
             print n.abs
             for line in n.open_file() :
