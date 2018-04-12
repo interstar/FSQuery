@@ -27,6 +27,10 @@ class FSNode :
         "True if this FSNode is a directory"
         return os.path.isdir(self.abs)
 
+    def islink(self) :
+        "Is it a symbolic link?"
+        return os.path.islink(self.abs)
+
     def children(self) :
         "If the FSNode is a directory, returns a list of the children"
         if not self.isdir() : raise Exception("FSQuery tried to return the children of a node which is not a directory : %s" % self.abs)
@@ -120,6 +124,9 @@ Directories excluded by this filter are not searched."""
                 if self.check_return(fsNode) :
                     yield fsNode                
                 for n in fsNode.children() :
+                    if n.islink() :
+                        # currently we don't follow links
+                        continue
                     for n2 in self.walk(depth+1,n) :
                         if self.check_return(n2) :
                             yield n2
@@ -208,59 +215,10 @@ Directories excluded by this filter are not searched."""
         
 
 if __name__ == '__main__' :
-    fsq = FSQuery("o")
-    def f(x) : print(x)
-    fsq.foreach(f)
-
-    class Processor :
-        def process_dir(self,fsNode) :
-            print("this is a dir : %s" % fsNode)
-        def process_file(self,fsNode) :
-            print("this is a file : %s" % fsNode)
-        
-    fsq.process_each(Processor())
-
-
-    print "__________________________________________________------------------------------------------------------------"
+    from fsquery import FSQuery, FSNode
     
-
-    fsq = FSQuery("../..").NoFollow("vendor").FileOnly().Ext("css")
-    for n in fsq :
-        print n.abs, n.ext()
-        
-    print "----------------------------------------_______________________________---------------------------------------"
-    
-
-        
-    fsq = FSQuery("../..").NoFollow("vendor").DirContains(lambda n : n.ext() == "py")
-    for n in fsq :
-        print n.abs
-        if n.isdir() :
-            print ["%s"%c.basename() for c in n.children()]
-            
-
-    print "----------------------------------------_______________________________---------------------------------------"
-    fsq = FSQuery("../..").NoFollow("vendor").Ext("py").Contains("GNU Lesser General Public License").FileOnly()
-    for n in fsq :
-        print n.abs
-        #for line in n.open_file() :
-        #    print line.rstrip()
-        #print "_________________________________________________________________________________________"
-    
-    
-    print "----------------------------------------_______________________________---------------------------------------"
-    
-    class Shadower :
-        def process_dir(self,node,shadow_node) :
-            print node.abs
-            print shadow_node.abs
-            shadow_node.mk_dir()
-            
-        def process_file(self,node,shadow_node) :
-            content = node.open_file().read()
-            shadow_node.write_file(shadow_node.abs,content)
-            
-    fsq = FSQuery("o")
-    fsq.shadow("x",Shadower())
+    fsq = FSQuery("/home/USER/CODE/").Ext("py").NoFollow("\.git").NoFollow("bluedrive").FileOnly()
+    for node in fsq :
+        print node.abs
         
     

@@ -205,3 +205,7 @@ We use two more convenience functions on FSNode, `open_file` to open the file re
 Of course, shadow is running through a standard FSQuery result, so if we had restricted that result, using our usual NoFollow, Match, or even Contains queries, we would be processing only that query result.
 
 And, of course, you don't need to limit yourself to just copying one directory. Depending on your Shadower class, this can be used for a wide variety of functionality. 
+
+## Known Issues
+
+###Currently FSQuery ignores symbolic links. ###
