@@ -9,7 +9,13 @@ FSQuery is a tiny Python library inspired by JQuery designed to let you query an
 
 ### Quickstart
 
+Install from Pip
 
+    pip install fsquery 
+
+
+[On PyPI](https://pypi.org/project/fsquery/)
+ 
 ### Things you can do with FSQuery 
 
 Create a query starting at a path and list it
