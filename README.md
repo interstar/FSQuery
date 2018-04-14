@@ -9,7 +9,7 @@ FSQuery is a tiny Python library inspired by JQuery designed to let you query an
 
 ### Quickstart
 
-Install from Pip
+Install from PyPI
 
     pip install fsquery 
 
@@ -125,7 +125,7 @@ However, when shadowing, FSQuery is not just iterating through the original quer
 
 Here's a simple example :
 
-Say we have a simple directory structure hangin under `o`
+Say we have a simple directory structure hanging under `o`
 
     > find o
     o
