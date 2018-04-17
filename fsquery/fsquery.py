@@ -67,6 +67,22 @@ class FSNode :
                 if r.search(line) :
                     return True
         return False
+
+    def get_child(self,pat) :
+        if not self.isdir() : raise Exception("FSQuery tried to get a child in a node which is not a directory : %s" % self.abs)
+        r = re.compile(pat)
+        for c in self.children() :
+            if r.search(c.basename()) : return c
+        return False
+
+    def contains_file(self,pat) :
+        if not self.isdir() : raise Exception("FSQuery tried to check filenames in a node which is not a directory : %s" % self.abs)
+        c = self.get_child(pat)
+        if c : return True
+        else : return False        
+        
+    def get_parent(self) :
+        return FSNode(os.path.dirname(self.abs),self.root,self.depth-1)
         
     def clone(self,new_root) :
         return FSNode(new_root+"/"+self.relative(),new_root,self.depth)
