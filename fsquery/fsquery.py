@@ -1,6 +1,6 @@
 import os
 import re 
-
+import datetime
 
 from shutil import copyfile
 
@@ -37,6 +37,14 @@ class FSNode :
     def relative(self) :
         return self.abs.replace(self.root,"")
 
+    def ts_changed(self) :
+        "TimeStamp of last changed time / date"
+        return os.path.getmtime(self.abs)
+        
+    def changed(self) :
+        "Formatted last changed time / date"
+        return "%s"%datetime.datetime.fromtimestamp(self.ts_changed())
+        
     def isdir(self) :
         "True if this FSNode is a directory"
         return os.path.isdir(self.abs)
