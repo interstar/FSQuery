@@ -1,6 +1,20 @@
 import os
 import re 
 
+
+from shutil import copyfile
+
+class CopyShadower :
+
+    def process_dir(self,node,shadow_node) :
+        print "shadowing dir %s to %s " % (node.abs,shadow_node.abs)
+        shadow_node.mk_dir()
+        
+    def process_file(self,node,shadow_node) :
+        print "copying %s to %s" % (node.abs,shadow_node.abs)
+        copyfile(node.abs, shadow_node.abs)
+        print "done"
+        
 class FSNode :
     def __init__(self,path_s, root, depth) :
         self.abs = os.path.abspath(path_s)
@@ -183,7 +197,11 @@ Directories excluded by this filter are not searched."""
         q.return_criteria = self.return_criteria[:]
         return q
  
- 
+
+    def pp(self) :
+        for n in self.__iter__() :
+            print(n.abs)
+
         
     # From here on are the normal methods you'd expect a user to call.
     
