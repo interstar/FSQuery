@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='fsquery',
-      version='0.1.7',
+      version='0.1.8',
       description='File System Query.       Working with the file system is too verbose. Let\'s make it more like JQuery.',
       long_description="""File System Query. 
 

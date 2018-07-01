@@ -26,12 +26,14 @@ Create a query starting at a path and list it
         for n in fsq :
             print n
 
+When you iterate through an `FSQuery`, you get objects of class `FSNode` back. FSNodes have a useful `.abs` property which is the full path name of the file or directory they represent.
+
 
 Find *files* that match a particular criteria
 
         fsq = FSQuery(path).Match(".js$")
         for n in fsq :
-            print n
+            print n.abs
 
 
 Note that FSQuery matches using an ordinary regex, so you can use regex elements in it. But be careful not to put bad regex in, it will crash.
@@ -40,19 +42,19 @@ Add a FileOnly() call, to constrain the output to show only files (not directori
 
         fsq = FSQuery(path).Match(".js$").FileOnly()  
         for n in fsq :
-            print n
+            print n.abs
 
 You can also explicitly match just file extensions.
 
         fsq = FSQuery(path).Ext("css").FileOnly()  
         for n in fsq :
-            print n
+            print n.abs
 
 Filter out a directory you aren't interested in, using NoFollow.
 
         fsq = FSQuery(path).Match(".js$").NoFollow("vendor").FileOnly()  
         for n in fsq :
-            print n
+            print n.abs
 
 
 Finally, of course, it's very useful (though somewhat slow) to be able to look inside the files and see what they contain.
@@ -66,22 +68,21 @@ Note that you can add as many NoFollows and Matches and Contains as you like. No
 
 Note also that if you add two Ext() constraints these will fight (no file can have two extensions at the same time) and your query will return nothing.
 
+### Command Liners
+
+The FSQuery object has a `pp()` method which actually does the looping and printing for you.
+
+This makes FSQuery useful for *one-liners* run directly on the command line like this.
+
+        python -c 'from fsquery import FSQuery; FSQuery(".").Ext("html").FileOnly().pp()'
+
+
 
 ### FSNodes
 
-From the previous examples, you'll notice that what is returned by FSQuery are FSNodes. FSNodes provide several further useful attributes and methods.
+`FSNode.changed()` returns a formatted time-stamp of when the file was last changed. (Uses `os.path.getmtime`)
 
-`FSNode.abs` is the absolute name of the file or node. 
-
-Eg.
-
-        fsq = FSQuery(path).Match(".js$").NoFollow("vendor").FileOnly()  
-        for n in fsq :
-            print n.abs
-            
-will lists the returned nodes as ordinary text (as if running `find` in Unix)
-
-`FSNode.open_file` will, if the FSNode is a file, open it for reading and return a file handle. It throws an exception if the FSNode is a directory.
+`FSNode.open_file()` will, if the FSNode is a file, open it for reading and return a file handle. It throws an exception if the FSNode is a directory.
 
 Eg.
 
@@ -94,10 +95,10 @@ Eg.
      
 
 
-
 `FSNode.children()` will return a list of the immediate children of the node. (As new FSNodes)
 
 `FSNode.spawn_query()` creates a new FSQuery, starting at this FSNode. 
+
 
 ### Processing and Shadowing
 
