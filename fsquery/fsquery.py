@@ -7,13 +7,13 @@ from shutil import copyfile
 class CopyShadower :
 
     def process_dir(self,node,shadow_node) :
-        print "shadowing dir %s to %s " % (node.abs,shadow_node.abs)
+        print(("shadowing dir %s to %s " % (node.abs,shadow_node.abs)))
         shadow_node.mk_dir()
         
     def process_file(self,node,shadow_node) :
-        print "copying %s to %s" % (node.abs,shadow_node.abs)
+        print(("copying %s to %s" % (node.abs,shadow_node.abs)))
         copyfile(node.abs, shadow_node.abs)
-        print "done"
+        print("done")
         
 class FSNode :
     def __init__(self,path_s, root, depth) :
@@ -208,7 +208,7 @@ Directories excluded by this filter are not searched."""
 
     def pp(self) :
         for n in self.__iter__() :
-            print(n.abs)
+            print((n.abs))
 
         
     # From here on are the normal methods you'd expect a user to call.
@@ -257,10 +257,10 @@ Directories excluded by this filter are not searched."""
         
 
 if __name__ == '__main__' :
-    from fsquery import FSQuery, FSNode
+    from .fsquery import FSQuery, FSNode
     
     fsq = FSQuery("/home/USER/CODE").Ext("py").NoFollow("\.git").FileOnly()
     for node in fsq :
-        print (node.abs)
+        print((node.abs))
         
     
