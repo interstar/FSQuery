@@ -1,0 +1,3 @@
+A public or collective good is defined as a good that is ‘non-rival’. This means: consumption of it by one person does not reduce the amount available to be consumed by others.
+
+...

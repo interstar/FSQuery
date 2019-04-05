@@ -75,7 +75,7 @@ class FSNode :
     def open_file(self) :
         """If this FSNode is a file, open it for reading and return the file handle"""
         if self.isdir() : raise Exception("FSQuery tried to open a directory as a file : %s" % self.abs)
-        return open(self.abs)
+        return open(self.abs, encoding='ISO-8859-1')
 
     def mk_dir(self) :
         """If this FSNode doesn't currently exist, then make a directory with this name."""
@@ -262,5 +262,3 @@ if __name__ == '__main__' :
     fsq = FSQuery("/home/USER/CODE").Ext("py").NoFollow("\.git").FileOnly()
     for node in fsq :
         print((node.abs))
-        
-    
