@@ -4,15 +4,16 @@ import datetime
 
 from shutil import copyfile
 
-class DefaultProcessor :
-
+class NullVisitor :
     def process_dir(self,fsNode) :
-        print("this is a dir : %s" % fsNode)
+        pass
 
     def process_file(self,fsNode) :
-        print("this is a file : %s" % fsNode)
+        pass
 
-    def 
+    def quit(self,fsNode) :
+        return False
+
 
 class CopyShadower :
 
@@ -27,6 +28,8 @@ class CopyShadower :
         
 
 def makeNode(path_s,root,depth) :
+    """ Makes a new node. Type depends if directory or file"""
+
     path = os.path.abspath(path_s)
     "True if this FSNode is a directory"
     if os.path.isdir(path) :
@@ -67,6 +70,7 @@ class FSNode :
         
     def isDir(self) :
         return os.path.isdir(self.abs)
+
 
     def islink(self) :
         "Is it a symbolic link?"
@@ -142,6 +146,7 @@ class FSFileNode(FSNode) :
                     return True
         return False
         
+    
 
 class FSQuery :
     def __init__(self,root_s) :
@@ -181,7 +186,7 @@ Directories excluded by this filter are not searched."""
         self.return_criteria.append(f)
         return self
         
-    def walk(self,depth=0,fsNode=None) :
+    def walk(self,visitor=NullVisitor(),depth=0,fsNode=None) :
         """Note, this is a filtered walk"""
         if not fsNode :
             fsNode = makeNode(self.init_path,self.init_path,0)
@@ -189,31 +194,25 @@ Directories excluded by this filter are not searched."""
         if fsNode.isDir() :
             if self.check_dir(fsNode) :
                 if self.check_return(fsNode) :
+                    visitor.process_dir(fsNode)
                     yield fsNode                
                 for n in fsNode.children() :
                     if n.islink() :
                         # currently we don't follow links
                         continue
-                    for n2 in self.walk(depth+1,n) :
-                        if self.check_return(n2) :
-                            yield n2
-
+                    for n2 in self.walk(visitor,depth+1,n) :
+                        yield n2
         else :
             if self.check_file(fsNode) :
                 if self.check_return(fsNode) :
+                    visitor.process_file(fsNode)
                     yield fsNode
         return
         
-    def foreach(self,visitor) :
+    def foreach(self,visit_fn) :
         for w in self.walk() :
-            visitor(w)
+            visit_fn(w)
 
-    def process_each(self,visitor) :
-        for w in self.walk() :
-            if w.isDir() :
-                visitor.process_dir(w)
-            else :
-                visitor.process_file(w)
 
     def __iter__(self) :
         return (w for w in self.walk())
