@@ -11,7 +11,7 @@ class NullVisitor :
     def process_file(self,fsNode) :
         pass
 
-    def quit(self,fsNode) :
+    def quit(self,fsNode,depth) :
         return False
 
 
@@ -190,7 +190,10 @@ Directories excluded by this filter are not searched."""
         """Note, this is a filtered walk"""
         if not fsNode :
             fsNode = makeNode(self.init_path,self.init_path,0)
-       
+
+        if visitor.quit(fsNode,depth) :
+            return
+
         if fsNode.isDir() :
             if self.check_dir(fsNode) :
                 if self.check_return(fsNode) :
