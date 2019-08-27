@@ -4,6 +4,16 @@ import datetime
 
 from shutil import copyfile
 
+class DefaultProcessor :
+
+    def process_dir(self,fsNode) :
+        print("this is a dir : %s" % fsNode)
+
+    def process_file(self,fsNode) :
+        print("this is a file : %s" % fsNode)
+
+    def 
+
 class CopyShadower :
 
     def process_dir(self,node,shadow_node) :
@@ -15,6 +25,16 @@ class CopyShadower :
         copyfile(node.abs, shadow_node.abs)
         print("done")
         
+
+def makeNode(path_s,root,depth) :
+    path = os.path.abspath(path_s)
+    "True if this FSNode is a directory"
+    if os.path.isdir(path) :
+        return FSDirNode(path_s,root,depth)
+    else :
+        return FSFileNode(path_s,root,depth)
+        
+
 class FSNode :
     def __init__(self,path_s, root, depth) :
         self.abs = os.path.abspath(path_s)
@@ -45,63 +65,21 @@ class FSNode :
         "Formatted last changed time / date"
         return "%s"%datetime.datetime.fromtimestamp(self.ts_changed())
         
-    def isdir(self) :
-        "True if this FSNode is a directory"
+    def isDir(self) :
         return os.path.isdir(self.abs)
 
     def islink(self) :
         "Is it a symbolic link?"
         return os.path.islink(self.abs)
-
-    def children(self) :
-        "If the FSNode is a directory, returns a list of the children"
-        if not self.isdir() : raise Exception("FSQuery tried to return the children of a node which is not a directory : %s" % self.abs)
-        return [FSNode(self.abs + "/" + x,self.root,self.depth+1) for x in os.listdir(self.abs)]
         
     def spawn_query(self) :
         """Create a new FSQuery, starting from this node"""
         return FSQuery(self.abs)
-        
-    def write_file(self,fullName,content) :
-        with open(fullName,"w") as f :
-            f.write(content)
-            
-    def add_file(self,fName,content) :
-        """If this FSNode is a directory, write a file called fName containing content inside it"""
-        if not self.isdir() : raise Exception("FSQuery tried to add a file in a node which is not a directory : %s" % self.abs)
-        self.write_file("%s/%s"%(self.abs,fName),content)        
-        
-
-    def open_file(self) :
-        """If this FSNode is a file, open it for reading and return the file handle"""
-        if self.isdir() : raise Exception("FSQuery tried to open a directory as a file : %s" % self.abs)
-        return open(self.abs, encoding='ISO-8859-1')
 
     def mk_dir(self) :
         """If this FSNode doesn't currently exist, then make a directory with this name."""
         if not os.path.exists(self.abs) :
             os.makedirs(self.abs)
-        
-    def contains(self,pat) :
-        r = re.compile(pat)
-        with self.open_file() as f :
-            for line in f :
-                if r.search(line) :
-                    return True
-        return False
-
-    def get_child(self,pat) :
-        if not self.isdir() : raise Exception("FSQuery tried to get a child in a node which is not a directory : %s" % self.abs)
-        r = re.compile(pat)
-        for c in self.children() :
-            if r.search(c.basename()) : return c
-        return False
-
-    def contains_file(self,pat) :
-        if not self.isdir() : raise Exception("FSQuery tried to check filenames in a node which is not a directory : %s" % self.abs)
-        c = self.get_child(pat)
-        if c : return True
-        else : return False        
         
     def get_parent(self) :
         return FSNode(os.path.dirname(self.abs),self.root,self.depth-1)
@@ -110,9 +88,60 @@ class FSNode :
         return FSNode(new_root+"/"+self.relative(),new_root,self.depth)
         
     def __str__(self) :
-        return "[<FSNode : %s , rel: %s , depth %s , isdir? %s>]"% (self.abs, self.relative(), self.depth, self.isdir())
+        return "[<FSNode : %s , rel: %s , depth %s , isdir? %s>]"% (self.abs, self.relative(), self.depth, self.isDir())
             
+class FSDirNode(FSNode) :
+    def __init__(self,path_s, root, depth) :
+        self.abs = os.path.abspath(path_s)
+        self.depth = depth
+        self.root=os.path.abspath(root)
 
+    def isDir(self) : return True
+
+    def add_file(self,fName,content) :
+        """Write a file called fName containing content inside it"""
+        self.write_file("%s/%s"%(self.abs,fName),content)        
+
+    def children(self) :
+        "Returns a list of the children"
+        return [makeNode(self.abs + "/" + x,self.root,self.depth+1) for x in os.listdir(self.abs)]
+
+    def get_child(self,pat) :
+        r = re.compile(pat)
+        for c in self.children() :
+            if r.search(c.basename()) : return c
+        return False
+
+    def contains_file(self,pat) :
+        c = self.get_child(pat)
+        if c : return True
+        else : return False        
+
+
+class FSFileNode(FSNode) :
+    def __init__(self,path_s, root, depth) :
+        self.abs = os.path.abspath(path_s)
+        self.depth = depth
+        self.root=os.path.abspath(root)
+
+    def isDir(self) : return False
+
+    def open_file(self) :
+        """Open it for reading and return the file handle"""
+        return open(self.abs, encoding='ISO-8859-1')
+
+    def overwrite_file(self,fullName,content) :
+        with open(fullName,"w") as f :
+            f.write(content)
+
+    def contains(self,pat) :
+        r = re.compile(pat)
+        with self.open_file() as f :
+            for line in f :
+                if r.search(line) :
+                    return True
+        return False
+        
 
 class FSQuery :
     def __init__(self,root_s) :
@@ -155,9 +184,9 @@ Directories excluded by this filter are not searched."""
     def walk(self,depth=0,fsNode=None) :
         """Note, this is a filtered walk"""
         if not fsNode :
-            fsNode = FSNode(self.init_path,self.init_path,0)
-            
-        if fsNode.isdir() :
+            fsNode = makeNode(self.init_path,self.init_path,0)
+       
+        if fsNode.isDir() :
             if self.check_dir(fsNode) :
                 if self.check_return(fsNode) :
                     yield fsNode                
@@ -168,11 +197,12 @@ Directories excluded by this filter are not searched."""
                     for n2 in self.walk(depth+1,n) :
                         if self.check_return(n2) :
                             yield n2
+
         else :
             if self.check_file(fsNode) :
                 if self.check_return(fsNode) :
                     yield fsNode
-        raise StopIteration
+        return
         
     def foreach(self,visitor) :
         for w in self.walk() :
@@ -180,7 +210,7 @@ Directories excluded by this filter are not searched."""
 
     def process_each(self,visitor) :
         for w in self.walk() :
-            if w.isdir() :
+            if w.isDir() :
                 visitor.process_dir(w)
             else :
                 visitor.process_file(w)
@@ -188,11 +218,11 @@ Directories excluded by this filter are not searched."""
     def __iter__(self) :
         return (w for w in self.walk())
 
-    def shadow(self,new_root,visitor) :
+    def shadow(self,new_root,visitor=CopyShadower()) :
         """ Runs through the query, creating a clone directory structure in the new_root. Then applies process"""
         for n in self.walk() :
             sn = n.clone(new_root)
-            if n.isdir() :
+            if n.isDir() :
                 visitor.process_dir(n,sn)
             else :
                 visitor.process_file(n,sn)
@@ -211,7 +241,17 @@ Directories excluded by this filter are not searched."""
             print((n.abs))
 
         
-    # From here on are the normal methods you'd expect a user to call.
+    def take(self,x) :
+        c = 0
+        for n in self.__iter__() :
+            yield n
+            c = c + 1
+            if c == x :
+                return
+
+
+
+    # From here on are the search constraints on the FSQuery.
     
     def Match(self,pat) :
         r = re.compile(pat)
@@ -239,7 +279,7 @@ Directories excluded by this filter are not searched."""
     def DirContains(self,f) :
         """ Matches dirs that have a child that matches filter f"""
         def match(fsNode) :
-            if not fsNode.isdir() : return False 
+            if not fsNode.isDir() : return False 
             for c in fsNode.children() :
                 if f(c) : return True
             return False
@@ -247,18 +287,13 @@ Directories excluded by this filter are not searched."""
 
     def FileOnly(self) :
         def match(fsNode) :
-            return not fsNode.isdir()
+            return not fsNode.isDir()
         self.make_return(match)
         return self
         
     def DirOnly(self) :
-        self.make_return(lambda fsn : fsn.isdir())
+        self.make_return(lambda fsn : fsn.isDir())
         return self
         
 
-if __name__ == '__main__' :
-    from .fsquery import FSQuery, FSNode
-    
-    fsq = FSQuery("/home/USER/CODE").Ext("py").NoFollow("\.git").FileOnly()
-    for node in fsq :
-        print((node.abs))
+

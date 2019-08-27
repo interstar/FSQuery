@@ -1,2 +1,2 @@
-from .fsquery import FSNode, FSQuery
+from .fsquery import FSNode, FSQuery, FSFileNode, FSDirNode
 
