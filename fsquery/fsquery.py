@@ -1,6 +1,7 @@
 import os
 import re 
 import datetime
+import io
 
 from shutil import copyfile
 
@@ -132,10 +133,10 @@ class FSFileNode(FSNode) :
 
     def open_file(self) :
         """Open it for reading and return the file handle"""
-        return open(self.abs, encoding='ISO-8859-1')
+        return io.open(self.abs, encoding='ISO-8859-1')
 
     def overwrite_file(self,fullName,content) :
-        with open(fullName,"w") as f :
+        with io.open(fullName,"w") as f :
             f.write(content)
 
     def contains(self,pat) :
@@ -188,6 +189,7 @@ Directories excluded by this filter are not searched."""
         
     def walk(self,visitor=NullVisitor(),depth=0,fsNode=None) :
         """Note, this is a filtered walk"""
+
         if not fsNode :
             fsNode = makeNode(self.init_path,self.init_path,0)
 
@@ -216,6 +218,9 @@ Directories excluded by this filter are not searched."""
         for w in self.walk() :
             visit_fn(w)
 
+    def walkeach(self,visitor) :
+        for w in self.walk(visitor) :
+            pass
 
     def __iter__(self) :
         return (w for w in self.walk())
