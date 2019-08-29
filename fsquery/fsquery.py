@@ -214,11 +214,11 @@ Directories excluded by this filter are not searched."""
                     yield fsNode
         return
         
-    def foreach(self,visit_fn) :
+    def for_each(self,visit_fn) :
         for w in self.walk() :
             visit_fn(w)
 
-    def walkeach(self,visitor) :
+    def walk_each(self,visitor) :
         for w in self.walk(visitor) :
             pass
 
