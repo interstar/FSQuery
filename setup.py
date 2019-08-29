@@ -24,7 +24,7 @@ This FSQuery searches all directories under /home/myaccount, except directories 
 
 It matches files with a ".py" extension. And the FileOnly() suppresses returning directories.
 
-See more documentation on the [GitHub page](https://github.com/interstar/FSQuery).
+See more documentation on the [README on GitHub](https://github.com/interstar/FSQuery).
       """,
       long_description_content_type='text/markdown',
       url='https://github.com/interstar/FSQuery',
